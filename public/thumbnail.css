@@ -1,0 +1,15 @@
+/* Card */
+
+.thumbnail { padding-bottom: 4px; border-radius: 3px; line-height: 13px; border: 1px solid #EEE; position: relative; box-shadow: 1px 2px 8px rgba(0, 0, 0, 0.034); transition: all 0.25s ease; }
+.thumbnail a:hover { text-decoration: none; }
+.thumbnail:hover { box-shadow: 1px 2px 15px rgba(116, 189, 226, 0.25); transition: all 0.35s ease; }
+.thumbnail h3 { font-size: 90%; margin: 0 0 0 3px; padding: 8px 10px 0 0; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; font-weight: 600; line-height: 18px; }
+.thumbnail h3 a { color: #444; }
+.thumbnail h3 a:hover { color: #EF6644; }
+.thumbnail img.img-rounded { margin: 4px 4px 0 0; float: left; border-radius: 3px; }
+.thumbnail small { font-size: 85%; color: #999; padding: 0 0 5px 0; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+.thumbnail small a { color: #999; text-decoration: none; }
+.thumbnail small a:hover { color: #EF6644; }
+.thumbnail .stats { line-height: 14px; bottom: 5px; right: 10px; position: absolute; background-color: #FFF; padding-left: 10px; }
+.thumbnail .stats a { font-size: 95%; color: #BBB; text-decoration: none; }
+.thumbnail .stats span { margin-left: 3px; }
