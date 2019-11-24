@@ -21,6 +21,7 @@ const _ = require("./!globals.js");
       let Agent = new _.HttpProxyAgent(
         `http://${$.get("prx").ip}:${$.get("prx").port}`
       );
+
       _.request(
         {
           uri: url,
@@ -88,6 +89,7 @@ const _ = require("./!globals.js");
     unicodeToChar,
     getRoute,
     rnd,
+    getSugg,
     newProxy
   };
 }
