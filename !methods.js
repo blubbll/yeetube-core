@@ -20,14 +20,17 @@ const _ = require("./!globals.js");
       */
   const getSugg = async (l, q) =>
     new Promise(async (resolve, reject) => {
-      var url = `http://suggestqueries.google.com/complete/search?client=firefox&cp=1&ds=yt&q=${q}&hl=${l}&format=5&alt=json&callback=?`;
-      //let ta = $.get("toragent");
-      //if (!ta) await newAgent(true);
-      /*console.warn(url);
+      const cKey = `sugg_{l}_${q}`;
+
+      if (!$.get(cKey)) {
+        var url = `http://suggestqueries.google.com/complete/search?client=youtube&cp=1&ds=yt&q=${q}&hl=${l}&format=5&alt=json&callback=?`;
+        //let ta = $.get("toragent");
+        //if (!ta) await newAgent(true);
+        /*console.warn(url);
       let Agent = new _.HttpProxyAgent(
         `http://${$.get("prx").ip}:${$.get("prx").port}`
       );*/
-      /*_.request(
+        /*_.request(
         {
           uri: url,
           //agent: ta,
@@ -46,26 +49,53 @@ const _ = require("./!globals.js");
         }
       );*/
 
-      var req = _.proxy.request(_.url.parse(url), exitNode => {
-        console.log(`Chosen proxy ${exitNode}`);
-      });
-      let body = "";
-      req.on("response", r => {
-        r.on("readable", () =>{
-          
-          body += r.read();
-        });
-        r.on("end", async () => {
-                  
+        let Agent = new _.HttpProxyAgent(
+          `http://${process.env.PROXYMESH_NODE}`
+        );
+        _.request(
+          {
+            uri: url,
+            //agent: ta,
+            method: "GET",
+            timeout: 3000,
+            followRedirect: true,
+            maxRedirects: 10,
+            encoding: "latin1"
+          },
+          async (error, response, body) => {
+            if (body) {
+              //resolve(`${body.split('",[')[1].split("]]")[0]}`);
+              let suggs = [];
+              body = `[${body.split("[[")[1].split("]]")[0]}]`.split(",");
+              for (const sugg of body) {
+                sugg !== "0]" && suggs.push(sugg.slice(2, -1));
+              }
 
-          if (body) {
-            const data = `${body.split('",[')[1].split("]]")[0]}`;
-            resolve(data);
-          } else setTimeout(resolve(await getSugg(l, q)), 999);
-        });
-      });
-      req.end();
+              suggs = JSON.stringify(suggs)
+                .normalize()
+                .normalize().slice(2, -1);
+              
+              //set cached suggest
+              $.set(cKey, suggs);
+
+              resolve(suggs);
+            } else {
+              //await newAgent();
+              setTimeout(resolve(await getSugg(l, q)), 999);
+            }
+          }
+        );
+      } else {
+        resolve($.get(cKey));
+      }
     });
+  /*
+        proxy: 
+   { host: 'us-wa.proxymesh.com',
+     port: 31280,
+     auth: 'Blubbll:ZPs4KrU3I4tdgzTq9rrNVEf6RZZMqoJTmtRrhR',
+     headers: { 'x-proxymesh-prefer-ip': '' } } }
+      */
 
   const rnd = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1) + min);
