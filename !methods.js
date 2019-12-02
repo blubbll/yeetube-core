@@ -14,18 +14,23 @@ const _ = require("./!globals.js");
       .join("/")}`.replace(/^[\W]app/, "");
   };
 
+  /*nst ta = new _.SocksProxyAgent(
+        `socks://127.0.0.1:9050`
+      );
+      */
   const getSugg = async (l, q) =>
     new Promise(async (resolve, reject) => {
       var url = `http://suggestqueries.google.com/complete/search?client=firefox&cp=1&ds=yt&q=${q}&hl=${l}&format=5&alt=json&callback=?`;
-      if (!$.get("prx")) await newProxy();
+      //let ta = $.get("toragent");
+      //if (!ta) await newAgent(true);
+      /*console.warn(url);
       let Agent = new _.HttpProxyAgent(
         `http://${$.get("prx").ip}:${$.get("prx").port}`
-      );
-
-      _.request(
+      );*/
+      /*_.request(
         {
           uri: url,
-          agent: Agent,
+          //agent: ta,
           method: "GET",
           timeout: 3000,
           followRedirect: true,
@@ -35,11 +40,31 @@ const _ = require("./!globals.js");
         async (error, response, body) => {
           if (body) resolve(`${body.split('",[')[1].split("]]")[0]}`);
           else {
-            await newProxy();
-            resolve(await getSugg(l, q));
+            //await newAgent();
+            setTimeout(resolve(await getSugg(l, q)), 999);
           }
         }
-      );
+      );*/
+
+      var req = _.proxy.request(_.url.parse(url), exitNode => {
+        console.log(`Chosen proxy ${exitNode}`);
+      });
+      let body = "";
+      req.on("response", r => {
+        r.on("readable", () =>{
+          
+          body += r.read();
+        });
+        r.on("end", async () => {
+                  
+
+          if (body) {
+            const data = `${body.split('",[')[1].split("]]")[0]}`;
+            resolve(data);
+          } else setTimeout(resolve(await getSugg(l, q)), 999);
+        });
+      });
+      req.end();
     });
 
   const rnd = (min, max) => {
@@ -65,7 +90,7 @@ const _ = require("./!globals.js");
     return this;
   };
 
-  const newProxy = () =>
+  /*const newProxy = () =>
     new Promise(async (resolve, reject) => {
       {
         const proxylist = require("proxylist");
@@ -77,7 +102,18 @@ const _ = require("./!globals.js");
           } else resolve(await newProxy());
         });
       }
-    });
+    });*/
+
+  /*const newAgent = (first) =>
+    new Promise(async (resolve, reject) => {
+      let tp = $.get("toragent");
+      if (!first && $.get("toragent")) resolve(tp.rotateAddress());
+      else
+        _.TorAgent.create(false, (err, agent) => {
+          if (err) reject(err);
+          else resolve(agent);
+        });
+    });*/
 
   const unicodeToChar = text => {
     return text.replace(/\\u[\dA-F]{4}/gi, function(match) {
@@ -89,7 +125,6 @@ const _ = require("./!globals.js");
     unicodeToChar,
     getRoute,
     rnd,
-    getSugg,
-    newProxy
+    getSugg
   };
 }

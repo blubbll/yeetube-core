@@ -12,5 +12,5 @@ const r = m.getRoute(__dirname);
 }
 
 {
-
+  include(r + "/test/*");
 }

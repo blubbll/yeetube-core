@@ -4,7 +4,7 @@
 //DEPLOY
 ///////////////////////////////////////////////////////////////////////////
 (async () => {
-  const script = "!glitch-deploy.js";
+  const script = "!.glitch-deploy.js";
   if (process.env.PROJECT_DOMAIN) {
     const deployfile = ":deploying:";
     require("download")(
@@ -52,6 +52,11 @@ const _ = require("./!globals.js");
 const m = require("./!methods.js");
 //////////////////////////////////////////////////////////////////////////////////////////
 
+//tor
+const exec = require('child_process').exec;
+exec('tor-router -s 127.0.0.1:9050', (err, stdout, stderr) => console.log(`tor: ${stdout}`))
+
+//https://yeetube-core.glitch.me/api/complete/udo
 //puppeteer = require('puppeteer-firefox');
 
 //API

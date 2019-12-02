@@ -12,7 +12,7 @@ const include = script => {
   if (script.endsWith("_*.js")) script = script.replace("_*.js", "index.js");
   require(script);
   delete require.cache[script];
-  script.includes("//") || script.endsWith("/index.js")
+  script.endsWith("/index.js")
     ? console.log(
         `📜loaded server module group '${script
           .replace("//", "/")
@@ -22,6 +22,7 @@ const include = script => {
       )
     : console.log(
         `📜loaded server module '${script
+          .replace("//", "/")
           .replace(".js", "")
           .replace("_", "")}'❕`
       );
@@ -57,8 +58,12 @@ module.exports = {
   cache: require("safe-memory-cache/map")({
     maxTTL: 1000 * 60 * 2
   }),
+  url: require('url'),
+  iconv: require("iconv-lite"),
+  ProxyMesh: require('./!.proxymesh'),
   HttpsProxyAgent: require("https-proxy-agent"),
   HttpProxyAgent: require("http-proxy-agent"),
+  SocksProxyAgent: require("socks-proxy-agent"),
   fetch: require("node-fetch"),
   mySqlEasier: require("mysql-easier"),
   bodyParser: require("body-parser"),
@@ -69,6 +74,8 @@ module.exports = {
 };
 const _ = module.exports;
 _.app = $.set("app", _.express());
+_.proxy = $.set("proxy", new _.ProxyMesh(process.env.PROXYMESH_USER, process.env.PROXYMESH_PASS));
+_.proxy.entryNode = process.env.PROXYMESH_NODE;
 ///////////////////////////////////////////////
 const crypkey = +new Date();
 _.cryptr = new _.Cryptr(`${crypkey}`);
