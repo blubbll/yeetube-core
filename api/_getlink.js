@@ -3,15 +3,11 @@
 const $ = require("node-global-storage");
 const _ = require("./../!globals.js");
 const m = require("./../!methods.js");
-const include = _.include;
 /////////////////////////////////////////////////////////////////////////////////////////
 const r = m.getRoute(__dirname);
 /////////////////////////////////////////////////////////////////////////////////////////
-{
-  include(r + "/autocomplete");
-  include(r + "/getlink");
-}
-
-{
-  include(r + "/test/*");
-}
+//https://shreyaschand.com/blog/2013/01/03/google-autocomplete-api/
+_.app.get(r + "/getlink/:id", async (req, res, next) => {
+  const r = await m.getLink(req.params.id);
+  res.send(`${m.unicodeToChar(r)}`);
+});

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "body-parser": "^1.19.0",
+    "cheerio": "^0.22.0",
     "compression": "^1.7.4",
     "cryptr": "^6.0.0",
     "download": "^7.1.0",
@@ -27,16 +28,16 @@
     "node-global-storage": "^1.2.3",
     "owasp-password-strength-test": "^1.3.0",
     "pino": "^5.14.0",
-    "pino-pretty": "^3.4.0",
+    "pino-pretty": "^3.5.0",
     "proxylist": "^1.0.2",
-    "puppeteer": "^2.0.0",
-    "puppeteer-firefox": "0.5.0",
     "request": "^2.88.0",
     "safe-memory-cache": "^1.5.1",
     "sha256": "^0.2.0",
     "socks-proxy-agent": "^4.0.2",
+    "sync-disk-cache": "^2.0.0",
     "tor-router": "^4.0.13",
-    "youtube-stream-url": "^1.0.1"
+    "youtube-stream-url": "^1.0.1",
+    "zombie": "^6.1.4"
   },
   "engines": {
     "node": "8.x"

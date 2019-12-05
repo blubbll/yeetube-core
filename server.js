@@ -53,8 +53,10 @@ const m = require("./!methods.js");
 //////////////////////////////////////////////////////////////////////////////////////////
 
 //tor
-const exec = require('child_process').exec;
-exec('tor-router -s 127.0.0.1:9050', (err, stdout, stderr) => console.log(`tor: ${stdout}`))
+const exec = require("child_process").exec;
+exec("tor-router -s 127.0.0.1:9050", (err, stdout, stderr) =>
+  console.log(`tor: ${stdout}`)
+);
 
 //https://yeetube-core.glitch.me/api/complete/udo
 //puppeteer = require('puppeteer-firefox');
@@ -71,6 +73,8 @@ let zombieOptions = {
     "accept-language": "en-US8,en;q=0.9,en-US;q=0.8,en;q=0.7"
   }
 };
+
+_.cache.clear();
 
 const aeon = {
   getThumb(args) {
@@ -106,19 +110,17 @@ const aeon = {
 _.app.use(_.express.static("public"));
 
 // http://expressjs.com/en/starter/basic-routing.html
-_.app.get("/", function(request, response) {
+_.app.get("/", (request, response) => {
   response.sendFile(__dirname + "/views/index.html");
 });
 
 // http://expressjs.com/en/starter/basic-routing.html
-_.app.get("/views/*", function(req, res) {
+_.app.get("/views/*", (req, res) => {
   const path = __dirname + req.url;
   if (_.fs.existsSync(path)) {
     res.sendFile(path);
   }
 });
-
-process.setMaxListeners(Infinity);
 
 // listen for requests :)
 const listener = _.app.listen(process.env.PORT, () => {
@@ -148,9 +150,10 @@ const pevents = [
   "response"
 ];
 (async () => {
-  /*const mobileUA = `Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/603.1.23 (KHTML, like Gecko) Version/10.0 Mobile/14E5239e Safari/602.1`;
+  /*  console.log("browser launding...");
+  const mobileUA = `Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/603.1.23 (KHTML, like Gecko) Version/10.0 Mobile/14E5239e Safari/602.1`;
     // Create headless session
-    browser = await puppeteer.launch({
+    browser = await _.puppeteer.launch({
         'args': [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -158,7 +161,6 @@ const pevents = [
             `--user-agent=${mobileUA}`,
         ]
     });*/
-  //const browser = await puppeteer.launch();
   console.log("browser ready");
 })();
 

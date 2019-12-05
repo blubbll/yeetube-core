@@ -14,6 +14,105 @@ const _ = require("./!globals.js");
       .join("/")}`.replace(/^[\W]app/, "");
   };
 
+  const mobileUA = `Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/603.1.23 (KHTML, like Gecko) Version/10.0 Mobile/14E5239e Safari/602.1`;
+
+  const browser = new _.zombie({
+    userAgent: mobileUA,
+    debug: false,
+    waitDuration: 30000,
+    silent: true,
+    headers: {
+      "accept-language": "en-US8,en;q=0.9,en-US;q=0.8,en;q=0.7"
+    }
+  });
+
+  const getLink = async id =>
+    new Promise(async (resolve, reject) => {
+      const cKey = `link_${id}`;
+
+      //if not cached
+      if (!_.cache.has(cKey)) {
+        var url = `https://m.youtube.com/watch?v=${id}`;
+
+        console.log(`Getting link for ${id}...`);
+        _.request(
+          {
+            uri: url,
+            agent: _.pAs,
+            method: "GET",
+            timeout: 3000,
+            followRedirect: true,
+            maxRedirects: 10,
+            encoding: "latin1",
+            headers: {
+              "cache-control": "no-cache",
+              pragma: "no-cache",
+              "upgrade-insecure-requests": "1",
+              "user-agent": mobileUA
+            },
+            referrer: "https://www.google.com/"
+          },
+          async (error, response, body) => {
+            
+            if (response.statusCode === 200) {
+              let $ = _.cheerio.load(body);
+
+              var window = {};
+              let ytInitialPlayerConfig = {};
+              const loadPlayerConfig = async cfg => {
+                setConfig(cfg.args);
+              };
+              eval($("script")[8].children[0].data);
+
+              const setConfig = async cfg => {
+                //console.log(cfg.url_encoded_fmt_stream_map)
+                const v = {
+                  id: id,
+                  author: cfg.author,
+                  captionUrl: cfg.iv_invideo_url,
+                  snap: {
+                    default: cfg.iurl,
+                    low: cfg.thumbnail_url,
+                    medium: cfg.iurlsq,
+                    high: cfg.iurlmq
+                  },
+                  title: cfg.title,
+                  ts: cfg.timestamp,
+                  formats: JSON.parse(cfg.player_response).streamingData.formats
+                };
+
+                if (v.formats[0].cipher) {
+                  console.log(`Getting link for premium vid ${id}...`);
+
+                  browser.visit(url);
+
+                  await browser.wait();
+                  await browser.clickLink(
+                    "#movie_player > div.ytp-cued-thumbnail-overlay > button > div"
+                  );
+                  console.log(browser.assert($("video").src));
+                  browser.destroy()
+
+                  resolve("premium");
+                } else {
+                  console.log(`Got link for ${id}...`);
+                  _.cache.set(cKey, v.formats);
+                  console.log(v.formats);
+                  resolve(v.formats);
+                }
+              };
+            } else {
+              console.log(body)
+              console.log(`Failed to get link for ${id} Retrying...`);
+              setTimeout(resolve(await getLink(id)), 2999);
+            }
+          }
+        );
+      } else {
+        resolve(_.cache.get(cKey));
+      }
+    });
+
   const getSugg = async (l, q) =>
     new Promise(async (resolve, reject) => {
       const cKey = `sugg_{l}_${q}`;
@@ -21,19 +120,10 @@ const _ = require("./!globals.js");
       //if not cached
       if (!$.get(cKey)) {
         var url = `http://suggestqueries.google.com/complete/search?client=youtube&cp=1&ds=yt&q=${q}&hl=${l}&format=5&alt=json&callback=?`;
-
-        let Agent = new _.HttpProxyAgent({
-          host: process.env.PROXYMESH_HOST,
-          port: process.env.PROXYMESH_PORT,
-          auth: [process.env.PROXYMESH_USER, process.env.PROXYMESH_PASS].join(
-            ":"
-          )
-        });
-        console.log(Agent);
         _.request(
           {
             uri: url,
-            agent: Agent,
+            agent: _.pA,
             method: "GET",
             timeout: 3000,
             followRedirect: true,
@@ -126,6 +216,7 @@ const _ = require("./!globals.js");
   module.exports = {
     unicodeToChar,
     getRoute,
+    getLink,
     rnd,
     getSugg
   };

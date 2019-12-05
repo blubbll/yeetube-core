@@ -54,11 +54,10 @@ module.exports = {
   }),
   fs: require("fs"),
   moment: require("moment"),
-  hash: require("sha256"),
-  cache: require("safe-memory-cache/map")({
+  hash: require("sha256"),  cache: require("safe-memory-cache/map")({
     maxTTL: 1000 * 60 * 2
   }),
-  url: require('url'),
+  url: require("url"),
   iconv: require("iconv-lite"),
   HttpsProxyAgent: require("https-proxy-agent"),
   HttpProxyAgent: require("http-proxy-agent"),
@@ -67,13 +66,25 @@ module.exports = {
   mySqlEasier: require("mysql-easier"),
   bodyParser: require("body-parser"),
   Cryptr: require("cryptr"),
-  owasp: require("owasp-password-strength-test"),
+  zombie: require('zombie'),
   include,
-  execute
+  execute,
+  Cache: require('sync-disk-cache'),
+  cheerio: require("cheerio")
 };
 const _ = module.exports;
 _.app = $.set("app", _.express());
-
+_.pA = new _.HttpProxyAgent({
+  host: process.env.PROXYMESH_HOST,
+  port: process.env.PROXYMESH_PORT,
+  auth: [process.env.PROXYMESH_USER, process.env.PROXYMESH_PASS].join(":")
+});
+_.pAs = new _.HttpsProxyAgent({
+  host: process.env.PROXYMESH_HOST,
+  port: process.env.PROXYMESH_PORT,
+  auth: [process.env.PROXYMESH_USER, process.env.PROXYMESH_PASS].join(":")
+});
+_.cache = new _.Cache('cache');
 ///////////////////////////////////////////////
 const crypkey = +new Date();
 _.cryptr = new _.Cryptr(`${crypkey}`);
