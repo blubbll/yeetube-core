@@ -8,6 +8,5 @@ const r = m.getRoute(__dirname);
 /////////////////////////////////////////////////////////////////////////////////////////
 //https://shreyaschand.com/blog/2013/01/03/google-autocomplete-api/
 _.app.get(r + "/complete/:l/:q", async (req, res, next) => {
-  const r = await m.getSugg(req.params.l, req.params.q);
-  res.send(`[${m.unicodeToChar(r)}]`);
+  res.send(await m.getSugg(req.params.l, req.params.q));
 });
